@@ -2876,7 +2876,7 @@ bool Tracking::TrackWithMotionModel()
     fill(mCurrentFrame.mvpMapPoints.begin(),mCurrentFrame.mvpMapPoints.end(),static_cast<MapPoint*>(NULL));
 
     // Project points seen in previous frame
-    int th;
+    int th; // searching neigborhood near the pixel
 
     if(mSensor==System::STEREO)
         th=7;

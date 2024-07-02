@@ -389,14 +389,14 @@ void Frame::AssignFeaturesToGrid()
 
     int nReserve = 0.5f*N/(nCells);
 
-    for(unsigned int i=0; i<FRAME_GRID_COLS;i++)
+    for(unsigned int i=0; i<FRAME_GRID_COLS;i++){
         for (unsigned int j=0; j<FRAME_GRID_ROWS;j++){
             mGrid[i][j].reserve(nReserve);
             if(Nleft != -1){
                 mGridRight[i][j].reserve(nReserve);
             }
         }
-
+    }
 
 
     for(int i=0;i<N;i++)
@@ -408,7 +408,7 @@ void Frame::AssignFeaturesToGrid()
         int nGridPosX, nGridPosY;
         if(PosInGrid(kp,nGridPosX,nGridPosY)){
             if(Nleft == -1 || i < Nleft)
-                mGrid[nGridPosX][nGridPosY].push_back(i);
+                mGrid[nGridPosX][nGridPosY].push_back(i); // save keypoint index
             else
                 mGridRight[nGridPosX][nGridPosY].push_back(i - Nleft);
         }
@@ -1065,7 +1065,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
 #endif
-
+    // number of keypoints (keys are the position)
     Nleft = mvKeys.size();
     Nright = mvKeysRight.size();
     N = Nleft + Nright;

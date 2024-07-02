@@ -1,0 +1,16 @@
+<launch>
+    <!-- <include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"/> -->
+
+    <!-- Define arguments with default values -->
+    <arg name="path_to_vocabulary" default="/home/gfs-ubuntu/Projects/caltran-bridge-project/ORB_SLAM3/Vocabulary/ORBvoc.txt" />
+    <arg name="path_to_camera_param" default="/home/gfs-ubuntu/Projects/caltran-bridge-project/ORB_SLAM3/Examples/Stereo-Inertial/RealSense_D435i.yaml" />
+    <arg name="online_rectification" default="false" />
+    <arg name="equalization" default="false" />
+
+    <!-- Define the node and pass the arguments -->
+    <node pkg="ORB_SLAM3" type="Stereo_Inertial" name="Stereo_Inertial" output="screen" args="$(arg path_to_vocabulary) $(arg path_to_camera_param) $(arg online_rectification) $(arg equalization)">
+        <remap from="/camera/left/image_raw" to="/camera/infra1/image_rect_raw" />
+        <remap from="/camera/right/image_raw" to="/camera/infra2/image_rect_raw" />
+        <remap from="/imu" to="/camera/imu"/>
+    </node>
+</launch>

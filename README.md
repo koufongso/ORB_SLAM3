@@ -56,11 +56,25 @@ We have tested the library in **Ubuntu 16.04** and **18.04**, but it should be e
 ## C++11 or C++0x Compiler
 We use the new thread and chrono functionalities of C++11.
 
+Note: (Tested on Ubuntu 20.04) The latest version requires C++14!
+
+## RealSense SDK
+
+Need to install realsense SDK if want to use D435i/D455 GRB-D camera, follow installation insturctions [here](https://dev.intelrealsense.com/docs/compiling-librealsense-for-linux-ubuntu-guide#building-librealsense2-sdk).
+
+
+## RealSense ROS wrapper
+
+follow installation instruction [here](https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy)
+
+
 ## Pangolin
 We use [Pangolin](https://github.com/stevenlovegrove/Pangolin) for visualization and user interface. Dowload and install instructions can be found at: https://github.com/stevenlovegrove/Pangolin.
 
 ## OpenCV
 We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at leat 3.0. Tested with OpenCV 3.2.0 and 4.4.0**.
+
+Note: (Tested on Ubuntu 20.04) Can change CMakeLists reuqire version to 4.2. 
 
 ## Eigen3
 Required by g2o (see below). Download and install instructions can be found at: http://eigen.tuxfamily.org. **Required at least 3.1.0**.
@@ -78,6 +92,11 @@ Required to calculate the alignment of the trajectory with the ground truth. **R
 ## ROS (optional)
 
 We provide some examples to process input of a monocular, monocular-inertial, stereo, stereo-inertial or RGB-D camera using ROS. Building these examples is optional. These have been tested with ROS Melodic under Ubuntu 18.04.
+
+## sophus (ROS)
+```
+sudo apt-get install ros-noetic-sophus
+```
 
 # 3. Building ORB-SLAM3 library and examples
 
@@ -166,7 +185,7 @@ and add at the end the following line. Replace PATH by the folder where you clon
   export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:PATH/ORB_SLAM3/Examples/ROS
   ```
   
-2. Execute `build_ros.sh` script:
+2. Important: before execution, copy ROS directory from /Examples_old to /Examples and also modify the CMakeLists.txt in /ROS/ORB_SLAM3 before Execute `build_ros.sh` script :
 
   ```
   chmod +x build_ros.sh

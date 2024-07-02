@@ -515,35 +515,35 @@ void System::ResetActiveMap()
 void System::Shutdown()
 {
     {
-        unique_lock<mutex> lock(mMutexReset);
-        mbShutDown = true;
+        unique_lock<mutex> lock(mMutexReset);     
     }
 
-    cout << "Shutdown" << endl;
+    //cout << "Shutdown" << endl;
 
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
-    /*if(mpViewer)
-    {
-        mpViewer->RequestFinish();
-        while(!mpViewer->isFinished())
-            usleep(5000);
-    }*/
+    // if(mpViewer)
+    // {
+    //     mpViewer->RequestFinish();
+    //     while(!mpViewer->isFinished())
+    //         cout<<"waiting for mpViewer to finished...\n";
+    //         usleep(5000);
+    // }
 
-    // Wait until all thread have effectively stopped
-    /*while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
-    {
-        if(!mpLocalMapper->isFinished())
-            cout << "mpLocalMapper is not finished" << endl;*/
-        /*if(!mpLoopCloser->isFinished())
-            cout << "mpLoopCloser is not finished" << endl;
-        if(mpLoopCloser->isRunningGBA()){
-            cout << "mpLoopCloser is running GBA" << endl;
-            cout << "break anyway..." << endl;
-            break;
-        }*/
-        /*usleep(5000);
-    }*/
+    // // Wait until all thread have effectively stopped
+    // while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
+    // {
+    //     if(!mpLocalMapper->isFinished())
+    //         cout << "mpLocalMapper is not finished" << endl;
+    //     if(!mpLoopCloser->isFinished())
+    //         cout << "mpLoopCloser is not finished" << endl;
+    //     if(mpLoopCloser->isRunningGBA()){
+    //         cout << "mpLoopCloser is running GBA" << endl;
+    //         cout << "break anyway..." << endl;
+    //         break;
+    //     }
+    //     usleep(5000);
+    // }
 
     if(!mStrSaveAtlasToFile.empty())
     {
@@ -557,8 +557,8 @@ void System::Shutdown()
 #ifdef REGISTER_TIMES
     mpTracker->PrintTimeStats();
 #endif
-
-
+    mbShutDown = true;
+    cout << "System::Shutdown!" << endl;
 }
 
 bool System::isShutDown() {

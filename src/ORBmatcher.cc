@@ -1699,6 +1699,7 @@ namespace ORB_SLAM3
             {
                 if(!LastFrame.mvbOutlier[i])
                 {
+                    // current point is not an outlier in the previous frame
                     // Project
                     Eigen::Vector3f x3Dw = pMP->GetWorldPos();
                     Eigen::Vector3f x3Dc = Tcw * x3Dw;
@@ -1711,7 +1712,7 @@ namespace ORB_SLAM3
                         continue;
 
                     Eigen::Vector2f uv = CurrentFrame.mpCamera->project(x3Dc);
-
+                    // project points out of image bounding box
                     if(uv(0)<CurrentFrame.mnMinX || uv(0)>CurrentFrame.mnMaxX)
                         continue;
                     if(uv(1)<CurrentFrame.mnMinY || uv(1)>CurrentFrame.mnMaxY)
