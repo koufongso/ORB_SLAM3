@@ -17,7 +17,6 @@
 */
 
 #include "Atlas.h"
-#include "Viewer.h"
 
 #include "GeometricCamera.h"
 #include "Pinhole.h"
@@ -66,8 +65,6 @@ void Atlas::CreateNewMap()
         mpCurrentMap->SetStoredMap();
         cout << "Stored map with ID: " << mpCurrentMap->GetId() << endl;
 
-        //if(mHasViewer)
-        //    mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
     }
     cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
 
@@ -94,11 +91,6 @@ unsigned long int Atlas::GetLastInitKFid()
     return mnLastInitKFidMap;
 }
 
-void Atlas::SetViewer(Viewer* pViewer)
-{
-    mpViewer = pViewer;
-    mHasViewer = true;
-}
 
 void Atlas::AddKeyFrame(KeyFrame* pKF)
 {

@@ -42,7 +42,6 @@ MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
 find_package(realsense2)
 
 include_directories(
@@ -51,7 +50,6 @@ ${PROJECT_SOURCE_DIR}/include
 ${PROJECT_SOURCE_DIR}/include/CameraModels
 ${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
 ${EIGEN3_INCLUDE_DIR}
-${Pangolin_INCLUDE_DIRS}
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -63,18 +61,18 @@ src/LocalMapping.cc
 src/LoopClosing.cc
 src/ORBextractor.cc
 src/ORBmatcher.cc
-src/FrameDrawer.cc
+
 src/Converter.cc
 src/MapPoint.cc
 src/KeyFrame.cc
 src/Atlas.cc
 src/Map.cc
-src/MapDrawer.cc
+
 src/Optimizer.cc
 src/Frame.cc
 src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
-src/Viewer.cc
+
 src/ImuTypes.cc
 src/G2oTypes.cc
 src/CameraModels/Pinhole.cpp
@@ -91,18 +89,18 @@ include/LocalMapping.h
 include/LoopClosing.h
 include/ORBextractor.h
 include/ORBmatcher.h
-include/FrameDrawer.h
+
 include/Converter.h
 include/MapPoint.h
 include/KeyFrame.h
 include/Atlas.h
 include/Map.h
-include/MapDrawer.h
+
 include/Optimizer.h
 include/Frame.h
 include/KeyFrameDatabase.h
 include/Sim3Solver.h
-include/Viewer.h
+
 include/ImuTypes.h
 include/G2oTypes.h
 include/CameraModels/GeometricCamera.h
@@ -121,7 +119,7 @@ add_subdirectory(Thirdparty/g2o)
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
-${Pangolin_LIBRARIES}
+
 ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 -lboost_serialization
