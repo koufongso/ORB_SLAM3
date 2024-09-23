@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(ORB_SLAM3)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -33,16 +33,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-find_package(OpenCV 4.2)
+find_package(OpenCV 3.2)
    if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 4.2 not found.")
+      message(FATAL_ERROR "OpenCV > 3.2 not found.")
    endif()
 
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
-find_package(realsense2)
+find_package(realsense2 REQUIRED)
+
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -129,7 +130,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 # If RealSense SDK is found the library is added and its examples compiled
 if(realsense2_FOUND)
     include_directories(${PROJECT_NAME}
-    ${realsense_INCLUDE_DIR}
+    ${realsense2_INCLUDE_DIR}
     )
     target_link_libraries(${PROJECT_NAME}
     ${realsense2_LIBRARY}

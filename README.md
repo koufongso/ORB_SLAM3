@@ -182,6 +182,10 @@ Tested with ROS Melodic and ubuntu 18.04.
 and add at the end the following line. Replace PATH by the folder where you cloned ORB_SLAM3:
 
   ```
+  source /opt/ros/melodic/setup.bash
+  ```
+
+  ```
   export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:PATH/ORB_SLAM3/Examples/ROS
   ```
   
