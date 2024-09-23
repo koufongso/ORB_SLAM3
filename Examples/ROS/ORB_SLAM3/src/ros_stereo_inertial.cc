@@ -96,7 +96,7 @@ int main(int argc, char **argv)
       bEqual = true;
   }
 
-  file.open("/home/gfs-ubuntu/output.txt", ofstream::out);
+  //file.open("/home/gfs-ubuntu/output.txt", ofstream::out);
 
   cout<<"creating SLAM system"<<endl;
   // Create SLAM system. It initializes all system threads and gets ready to process frames.
@@ -146,13 +146,17 @@ int main(int argc, char **argv)
 
   // Maximum delay, 5 seconds
   ros::Subscriber sub_imu = n.subscribe("/imu", 1000, &ImuGrabber::GrabImu, &imugb); 
+
+  //ros::Subscriber sub_img_left = n.subscribe("/d455/infra1/image_rect_raw", 100, &ImageGrabber::GrabImageLeft,&igb);
+  //ros::Subscriber sub_img_right = n.subscribe("/d455/infra2/image_rect_raw", 100, &ImageGrabber::GrabImageRight,&igb);
+
   ros::Subscriber sub_img_left = n.subscribe("/camera/left/image_raw", 100, &ImageGrabber::GrabImageLeft,&igb);
   ros::Subscriber sub_img_right = n.subscribe("/camera/right/image_raw", 100, &ImageGrabber::GrabImageRight,&igb);
 
   std::thread sync_thread(&ImageGrabber::SyncWithImu,&igb);
-
+  std::cout<<"system spining\n";
   ros::spin();
-  file.close();
+  //file.close();
   return 0;
 }
 
@@ -281,6 +285,7 @@ void ImageGrabber::SyncWithImu()
       Eigen::Matrix3f Rwc = Rcw.transpose();
       Eigen::Vector3f twc = -Rwc * tcw;
 
+      std::cout<<"Twc.x"<<twc.x()<<"\n";
       if(file.is_open()){
         file<<tImLeft<<","<<twc.x()<<","<<twc.y()<<","<<twc.z()<<"\n";
       }
