@@ -16,28 +16,27 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include<iostream>
-#include<algorithm>
-#include<fstream>
-#include<chrono>
-#include<vector>
-#include<queue>
-#include<thread>
-#include<mutex>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <chrono>
+#include <vector>
+#include <queue>
+#include <thread>
+#include <mutex>
 
-#include<ros/ros.h>
-#include<cv_bridge/cv_bridge.h>
-#include<sensor_msgs/Imu.h>
+#include <ros/ros.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/Imu.h>
+#include "geometry_msgs/PoseStamped.h"
 
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
-#include"../../../include/System.h"
-#include"../include/ImuTypes.h"
+#include "../../../include/System.h"
+#include "../include/ImuTypes.h"
 
 using namespace std;
 
-#include <fstream>
-ofstream file;
 
 class ImuGrabber
 {
@@ -72,7 +71,7 @@ public:
     cv::Ptr<cv::CLAHE> mClahe = cv::createCLAHE(3.0, cv::Size(8, 8));
 };
 
-
+ros::Publisher pub_pose; // global variable for ImageGrabber to publish pose (ROS) message
 
 int main(int argc, char **argv)
 {
@@ -81,27 +80,36 @@ int main(int argc, char **argv)
   ros::NodeHandle n("~");
   ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
   bool bEqual = false;
-  if(argc < 4 || argc > 5)
+  if(argc < 4 || argc > 6)
   {
-    cerr << endl << "Usage: rosrun ORB_SLAM3 Stereo_Inertial path_to_vocabulary path_to_settings do_rectify [do_equalize]" << endl;
+    cerr << endl << "Usage: rosrun ORB_SLAM3 Stereo_Inertial path_to_vocabulary path_to_settings do_rectify [do_equalize] [use_localizatoin]" << endl;
     ros::shutdown();
     return 1;
   }
   
   std::string sbRect(argv[3]);
-  if(argc==5)
+  if(argc>=5)
   {
     std::string sbEqual(argv[4]);
     if(sbEqual == "true")
       bEqual = true;
   }
 
-  //file.open("/home/gfs-ubuntu/output.txt", ofstream::out);
 
   cout<<"creating SLAM system"<<endl;
   // Create SLAM system. It initializes all system threads and gets ready to process frames.
   ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_STEREO,false);
-
+  
+  // decide which mode (SLAM/localization) to use
+  bool use_localization = false;
+  if(argc==6) use_localization = (std::string(argv[5]) == "true");
+  if(use_localization){
+    std::cout<<"use localization mode!\n";
+    SLAM.ActivateLocalizationMode();
+  }else{
+    std::cout<<"use SLAM mode!\n";
+  }
+    
   ImuGrabber imugb;
   ImageGrabber igb(&SLAM,&imugb,sbRect == "true",bEqual);
   
@@ -144,19 +152,22 @@ int main(int argc, char **argv)
         cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,igb.M1r,igb.M2r);
     }
 
-  // Maximum delay, 5 seconds
+  // Maximum delay, 5 seconds (comment: assume 200Hz IMU data rate?)
   ros::Subscriber sub_imu = n.subscribe("/imu", 1000, &ImuGrabber::GrabImu, &imugb); 
-
-  //ros::Subscriber sub_img_left = n.subscribe("/d455/infra1/image_rect_raw", 100, &ImageGrabber::GrabImageLeft,&igb);
-  //ros::Subscriber sub_img_right = n.subscribe("/d455/infra2/image_rect_raw", 100, &ImageGrabber::GrabImageRight,&igb);
 
   ros::Subscriber sub_img_left = n.subscribe("/camera/left/image_raw", 100, &ImageGrabber::GrabImageLeft,&igb);
   ros::Subscriber sub_img_right = n.subscribe("/camera/right/image_raw", 100, &ImageGrabber::GrabImageRight,&igb);
 
+  pub_pose = n.advertise<geometry_msgs::PoseStamped>("/ORB_SLAM3_pose", 1000); 
+
   std::thread sync_thread(&ImageGrabber::SyncWithImu,&igb);
   std::cout<<"system spining\n";
   ros::spin();
-  //file.close();
+  
+  // recieve shutdown signal
+  std::cout<<"Shutting down SLAM...\n";
+  SLAM.Shutdown();
+  
   return 0;
 }
 
@@ -221,6 +232,7 @@ void ImageGrabber::SyncWithImu()
       {
         imgRightBuf.pop();
         tImRight = imgRightBuf.front()->header.stamp.toSec();
+        //std::cout<<"while loop 1\n";
       }
       this->mBufMutexRight.unlock();
 
@@ -229,17 +241,20 @@ void ImageGrabber::SyncWithImu()
       {
         imgLeftBuf.pop();
         tImLeft = imgLeftBuf.front()->header.stamp.toSec();
+        //std::cout<<"while loop 2\n";
       }
       this->mBufMutexLeft.unlock();
 
       if((tImLeft-tImRight)>maxTimeDiff || (tImRight-tImLeft)>maxTimeDiff)
       {
-        // std::cout << "big time difference" << std::endl;
+        //std::cout << "big time difference 1\n";
         continue;
       }
-      if(tImLeft>mpImuGb->imuBuf.back()->header.stamp.toSec())
-          continue;
-
+      if(tImLeft>mpImuGb->imuBuf.back()->header.stamp.toSec()){
+        //std::cout << "IMU time older than image (left)\n";
+        continue;
+      }
+          
       this->mBufMutexLeft.lock();
       imLeft = GetImage(imgLeftBuf.front());
       imgLeftBuf.pop();
@@ -279,20 +294,31 @@ void ImageGrabber::SyncWithImu()
       }
 
       auto Tcw = mpSLAM->TrackStereo(imLeft,imRight,tImLeft,vImuMeas); // TrackStereo return world to camera
-      Eigen::Matrix3f Rcw = Tcw.rotationMatrix();
-      Eigen::Vector3f tcw = Tcw.translation();
-      // Compute the inverse rotation and translation
-      Eigen::Matrix3f Rwc = Rcw.transpose();
-      Eigen::Vector3f twc = -Rwc * tcw;
+      auto q_cw = Tcw.unit_quaternion();
+      auto t_cw = Tcw.translation();
 
-      std::cout<<"Twc.x"<<twc.x()<<"\n";
-      if(file.is_open()){
-        file<<tImLeft<<","<<twc.x()<<","<<twc.y()<<","<<twc.z()<<"\n";
-      }
+      // prepare ROS pose message
+      geometry_msgs::PoseStamped pose_msg;
+      // timestamp
+      pose_msg.header.stamp = ros::Time::now();
+      // point position
+      pose_msg.pose.position.x = t_cw.x();
+      pose_msg.pose.position.y = t_cw.y();
+      pose_msg.pose.position.z = t_cw.z();
+      // orientation
+      pose_msg.pose.orientation.x = q_cw.x();
+      pose_msg.pose.orientation.y = q_cw.y();
+      pose_msg.pose.orientation.z = q_cw.z();
+      pose_msg.pose.orientation.w = q_cw.w();
+      // publish
+      //std::cout<<pose_msg.pose.position.x<<"\n";
+      //std::cout<<"test\n";
+      pub_pose.publish(pose_msg);
 
       std::chrono::milliseconds tSleep(1);
       std::this_thread::sleep_for(tSleep);
     }
+    //std::cout<<"empty data queue\n";
   }
 }
 

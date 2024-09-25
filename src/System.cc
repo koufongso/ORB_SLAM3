@@ -271,7 +271,7 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
                 usleep(1000);
             }
 
-            mpTracker->InformOnlyTracking(true);
+            mpTracker->InformOnlyTracking(true); // change variable/ state mbOnlyTracking to true
             mbActivateLocalizationMode = false;
         }
         if(mbDeactivateLocalizationMode)

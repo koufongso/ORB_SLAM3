@@ -67,7 +67,8 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "ios": "cpp"
     },
     "cmake.configureOnOpen": false
 }

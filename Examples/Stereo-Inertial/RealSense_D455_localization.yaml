@@ -3,7 +3,7 @@
 # System config
 #--------------------------------------------------------------------------------------------
 
-System.SaveAtlasToFile: "map1" # save in ./.ros/D455_Atlas_tes.osa
+System.LoadAtlasFromFile: "map1" # save in ./.ros/D455_Atlas_tes.osa
 
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
