@@ -69,6 +69,13 @@ source /opt/ros/melodic/setup.bash
 export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:PATH/ORB_SLAM3/Examples/ROS
 roslaunch ORB_SLAM3 launch_d455.launch
 ```
+```
+#Run ORB_SLAM3 (ROS)
+
+source /opt/ros/melodic/setup.bash
+export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:/home/gfs/ORB_SLAM3/Examples/ROS
+roslaunch ORB_SLAM3 launch_d455.launch
+```
 
 ```
 #Run D455
