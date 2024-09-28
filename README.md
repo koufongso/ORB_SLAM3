@@ -10,7 +10,7 @@ I am currently compiling with C++14
 
 ## RealSense SDK
 
-It was tested with D455 camera.
+It was tested with D455 camera firmware 5.13.0.55 (seems firmware 5.16.0.1 is not compatible with ROS1 melodic but can work with realsene-viewer so be careful when considering upgrade the firmware).
 
 Need to install realsense SDK if want to use D435i/D455 GRB-D camera, follow installation insturctions [here](https://dev.intelrealsense.com/docs/compiling-librealsense-for-linux-ubuntu-guide#building-librealsense2-sdk).
 
@@ -83,4 +83,17 @@ roslaunch ORB_SLAM3 launch_d455.launch
 cd PATH_TO_realsense_ws
 source devel/setup.bash
 roslaunch realsense2_camera rs_camera.launch enable_infra1:=true enable_infra2:=true enable_accel:=true enable_gyro:=true unite_imu_method:=linear_interpolation enable_depth:=false enable_color:=false
+```
+
+# Monitor CPU and Memory Usage
+
+```
+#CPU
+```
+mpstat -P ALL 1 > <output_log_path>
+
+```
+#Memory
+
+free -h -s 1 > <output_log_path>
 ```
