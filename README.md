@@ -89,11 +89,10 @@ roslaunch realsense2_camera rs_camera.launch enable_infra1:=true enable_infra2:=
 
 ```
 #CPU
-```
 mpstat -P ALL 1 > <output_log_path>
+```
 
 ```
 #Memory
-
 free -h -s 1 > <output_log_path>
 ```
